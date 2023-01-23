@@ -1,5 +1,5 @@
-import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { Redirect, Route, RouteComponentProps } from 'react-router-dom';
+import { IonApp, IonRouterOutlet, IonTabs, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 
@@ -21,22 +21,36 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import './App.css';
+import Login from './pages/Login';
+import { createContext, useContext, useState } from 'react';
+import PageNotFound from './pages/PageNotFound';
 
 setupIonicReact();
+const userContext = createContext(null);
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/home">
-          <Home />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  const [currentUser, setCurrentUser] = useState();
+
+  return(
+    <IonApp>
+      <IonReactRouter>
+          <IonRouterOutlet>
+            <Route 
+              path="/home" 
+              render={(routeContext:RouteComponentProps) => <Home {...routeContext}/>} 
+            />
+            <Route 
+              exact 
+              path="/login" 
+              render={(routeContext:RouteComponentProps) => <Login {...routeContext}/>}
+            />
+            <Route exact path="/" render={() => <Redirect to="/login" />}/>
+            <Route component={PageNotFound}/>
+          </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
+  )
+};
 
 export default App;

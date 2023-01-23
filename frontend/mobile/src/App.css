@@ -1,0 +1,58 @@
+/* DISPLAY */
+.d-flex{
+    display: flex !important;
+}
+.d-block{
+    display: block !important;
+}
+.d-inline{
+    display: inline !important;
+}
+.d-inline-block{
+    display: inline-block;
+}
+
+/* JUSTIFY-CONTENT */
+.justify-content-end{
+    justify-content: end !important;
+}
+.justify-content-around{
+    justify-content: space-around !important;
+}
+.justify-content-center{
+    justify-content: center !important;
+}
+
+/* ALIGN-ITEMS */
+.align-items-start{
+    align-items: start !important;
+}
+.align-items-center{
+    align-items: center !important;
+}
+.align-items-end{
+    align-items: end !important;
+}
+
+/* TEXT FORMATING */
+.text-center{
+    text-align: center !important;
+}
+.text-justify{
+    text-align: justify;
+}
+.text-left{
+    text-align: left;
+}
+.text-right{
+    text-align: right;
+}
+.text-decoration-none{
+    text-decoration: none;
+}
+
+/* FONT FORMATTING */
+.color-medium{
+    color: var(--ion-color-medium);
+}
+
