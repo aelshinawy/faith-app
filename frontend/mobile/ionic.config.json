@@ -1,7 +1,0 @@
-{
-  "name": "faith-app-mobile",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "react"
-}
