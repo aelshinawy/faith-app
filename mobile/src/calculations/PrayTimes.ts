@@ -488,8 +488,7 @@ export class PrayTimes {
 
   dayPortion(times: Record<Exclude<TimeName, "midnight">, number>) {
     for (const i in times) {
-      let time = i as TimeName;
-      // @ts-ignore
+      const time = i as Exclude<TimeName, "midnight">;
       times[time] /= 24;
     }
     return times;
