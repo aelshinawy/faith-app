@@ -10,12 +10,11 @@ const PrayerTab: React.FC = () => {
     const date = new Date();
     const coords: number[] = [];
     navigator.geolocation.getCurrentPosition((pos) => {
-      const timeZone = -date.getTimezoneOffset() / 60;
+      const timezone = -date.getTimezoneOffset() / 60;
       coords.push(pos.coords.latitude, pos.coords.longitude);
       console.log("date: ", date);
       console.log("coords: ", coords);
-      console.log("timeZone: ", timeZone);
-      console.log(prayTimes.getTimes(date, coords, timeZone));
+      console.log(prayTimes.getTimes(date, coords, timezone));
     });
   }, []);
 

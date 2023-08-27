@@ -41,7 +41,7 @@ http://praytimes.org/calculation
 //------------------------ User Interface -------------------------
 
 
-	getTimes (date, coordinates [, timeZone [, dst [, timeFormat]]])
+	getTimes (date, coordinates [, timeZone [, timeFormat]]])
 
 	setMethod (method)       // set calculation method
 	adjust (parameters)      // adjust calculation parameters
@@ -264,6 +264,10 @@ class PrayTimes {
     }
   }
 
+  public setTimeFormat(timeFormat: TimeFormat) {
+    this.timeFormat = timeFormat;
+  }
+
   public tune(timeOffsets: TimeOffsets) {
     let time: TimeName;
     for (time in timeOffsets) {
@@ -288,14 +292,14 @@ class PrayTimes {
     date: Date | number[],
     coords: number[],
     timezone?: number | "auto",
-    dst?: number | "auto",
     format?: TimeFormat
   ) {
     this.lat = coords[0];
     this.lng = coords[1];
     this.elv = coords[2] ? coords[2] : 0;
     this.timeFormat = format || this.timeFormat;
-    console.log("format: ", this.timeFormat);
+    console.log("format is supposed to be: ", format);
+    console.log("format is set to: ", this.timeFormat);
 
     if (date instanceof Date)
       date = [date.getFullYear(), date.getMonth() + 1, date.getDate()];
@@ -303,9 +307,9 @@ class PrayTimes {
     if (timezone === undefined || timezone == "auto")
       timezone = this.getTimeZone(date);
 
-    if (dst === undefined || dst === "auto") dst = this.getDst(date);
+    this.timeZone = timezone;
 
-    this.timeZone = timezone + (dst !== 0 ? 1 : 0);
+    console.log("this.timezone = ", this.timeZone);
     this.jDate = this.julian(date) - this.lng / (15 * 24);
 
     return this.computeTimes();
@@ -316,6 +320,7 @@ class PrayTimes {
     const year = date[0];
     const t1 = this.gmtOffset([year, 0, 1]);
     const t2 = this.gmtOffset([year, 6, 1]);
+
     return Math.min(t1, t2);
   }
 
@@ -325,11 +330,6 @@ class PrayTimes {
     const GMTDiff = timeString.split(" ")[1];
     const hoursDiff = Number.parseInt(GMTDiff.slice(3, GMTDiff.length)) / 100;
     return hoursDiff;
-  }
-
-  // Get Daylight Saving Time
-  private getDst(date: Array<number>) {
-    return +(this.gmtOffset(date) !== this.getTimeZone(date));
   }
 
   // ---- Calculation Functions ----
@@ -660,7 +660,5 @@ class PrayTimes {
 }
 
 const prayerTimeCalculator = new PrayTimes("Egypt");
-prayerTimeCalculator.adjust({
-  timeFormat: "24h",
-});
+prayerTimeCalculator.setTimeFormat("12h");
 export default prayerTimeCalculator;
