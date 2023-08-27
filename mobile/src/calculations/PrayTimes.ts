@@ -63,7 +63,8 @@ http://praytimes.org/calculation
 */
 
 //---------------------- Degree-Based Math Class -----------------------
-import assert from "assert";
+
+import { assert, assertDefined } from "../utils/assert";
 
 const DMath = {
   dtr: function (d: number) {
@@ -208,21 +209,21 @@ const defaultTimeFormat: TimeFormat = "24h";
 const numIterations = 1;
 const invalidTime = "-----";
 
-export class PrayTimes {
-  calcMethod: Method;
-  lat?: number;
-  lng?: number;
-  elv?: number;
-  timeZone?: number;
-  jDate?: number;
-  params: Params;
-  offset: TimeOffsets = {};
+class PrayTimes {
+  private calcMethod: Method;
+  private lat?: number;
+  private lng?: number;
+  private elv?: number;
+  private timeZone?: number;
+  private jDate?: number;
+  private params: Params;
+  private offset: TimeOffsets = {};
 
-  settings: Settings = {
+  private settings: Settings = {
     ...defaultSettings,
   };
 
-  timeFormat = defaultTimeFormat;
+  private timeFormat = defaultTimeFormat;
 
   constructor(method: Method) {
     this.calcMethod = method;
@@ -243,13 +244,13 @@ export class PrayTimes {
     }
   }
 
-  setMethod(method: Method) {
+  // ---- Setters ----
+  public setMethod(method: Method) {
     this.adjust(methods[method].params);
     this.calcMethod = method;
   }
 
-  //Adjust settings (according to )
-  adjust(settings: Settings) {
+  public adjust(settings: Partial<Settings>) {
     //Reset Params to default
     this.settings = {
       ...defaultParams,
@@ -263,7 +264,7 @@ export class PrayTimes {
     }
   }
 
-  tune(timeOffsets: TimeOffsets) {
+  public tune(timeOffsets: TimeOffsets) {
     let time: TimeName;
     for (time in timeOffsets) {
       this.offset[time] = timeOffsets[time];
@@ -271,17 +272,19 @@ export class PrayTimes {
   }
 
   // ---- Getters ----
-  getMethod() {
+  public getMethod() {
     return this.calcMethod;
   }
-  getSettings() {
+
+  public getSettings() {
     return this.settings;
   }
-  getOffsets() {
+
+  public getOffsets() {
     return this.offset;
   }
 
-  getTimes(
+  public getTimes(
     date: Date | number[],
     coords: number[],
     timezone?: number | "auto",
@@ -292,6 +295,7 @@ export class PrayTimes {
     this.lng = coords[1];
     this.elv = coords[2] ? coords[2] : 0;
     this.timeFormat = format || this.timeFormat;
+    console.log("format: ", this.timeFormat);
 
     if (date instanceof Date)
       date = [date.getFullYear(), date.getMonth() + 1, date.getDate()];
@@ -308,14 +312,14 @@ export class PrayTimes {
   }
 
   // ---- Timezone functions ----
-  getTimeZone(date: Array<number>) {
+  private getTimeZone(date: Array<number>) {
     const year = date[0];
     const t1 = this.gmtOffset([year, 0, 1]);
     const t2 = this.gmtOffset([year, 6, 1]);
     return Math.min(t1, t2);
   }
 
-  gmtOffset(date: Array<number>) {
+  private gmtOffset(date: Array<number>) {
     const localDate = new Date(date[0], date[1] - 1, date[2], 12, 0, 0, 0);
     const timeString = localDate.toTimeString();
     const GMTDiff = timeString.split(" ")[1];
@@ -323,12 +327,13 @@ export class PrayTimes {
     return hoursDiff;
   }
 
-  getDst(date: Array<number>) {
+  // Get Daylight Saving Time
+  private getDst(date: Array<number>) {
     return +(this.gmtOffset(date) !== this.getTimeZone(date));
   }
 
   // ---- Calculation Functions ----
-  midDay(time: number) {
+  private midDay(time: number) {
     assert(this.jDate !== undefined);
     const eqt = this.sunPosition(this.jDate + time).equation;
     const noon = DMath.fixHour(12 - eqt);
@@ -337,7 +342,7 @@ export class PrayTimes {
 
   // compute declination angle of sun and equation of time
   // Ref: http://aa.usno.navy.mil/faq/docs/SunApprox.php
-  sunPosition(jd: number) {
+  private sunPosition(jd: number) {
     const D = jd - 2451545.0;
     const g = DMath.fixAngle(357.529 + 0.98560028 * D);
     const q = DMath.fixAngle(280.459 + 0.98564736 * D);
@@ -354,7 +359,8 @@ export class PrayTimes {
 
     return { declination: decl, equation: eqt };
   }
-  julian([year, month, day]: number[]) {
+
+  private julian([year, month, day]: number[]) {
     if (month <= 2) {
       year -= 1;
       month += 12;
@@ -371,7 +377,11 @@ export class PrayTimes {
     return JD;
   }
 
-  sunAngleTime(angle: number, time: number, direction?: RotationDirection) {
+  private sunAngleTime(
+    angle: number,
+    time: number,
+    direction?: RotationDirection
+  ) {
     assert(this.jDate !== undefined, "PrayerTimes.jDate is not defined");
     assert(this.lat !== undefined, "PrayerTimes.lat is not defined");
     const decl = this.sunPosition(this.jDate + time).declination;
@@ -386,7 +396,7 @@ export class PrayTimes {
   }
 
   // ---- Compute Prayer Times ----
-  computeTimes() {
+  private computeTimes() {
     // default times
     let times: Record<Exclude<TimeName, "midnight">, number> & {
       midnight?: number;
@@ -417,7 +427,9 @@ export class PrayTimes {
   }
 
   // convert times to given time format
-  modifyFormats(times: Record<TimeName, number>) {
+  private modifyFormats(
+    times: Record<TimeName, number>
+  ): Record<TimeName, string> {
     const formattedTimes: Record<TimeName, string> = {
       imsak: "",
       fajr: "",
@@ -435,13 +447,15 @@ export class PrayTimes {
         times[time],
         this.timeFormat
       );
+      console.log(formattedTimes[time]);
     }
-    return times;
+    return formattedTimes;
   }
 
   // convert float time to the given format (see timeFormats)
-  getFormattedTime(time: number, format: TimeFormat) {
+  private getFormattedTime(time: number, format: TimeFormat) {
     if (isNaN(time)) return invalidTime;
+    console.log(`modifying format of ${time} to `, format);
     if (format == "Float") return String(time);
 
     time = DMath.fixHour(time + 0.5 / 60); // add 0.5 minutes to round
@@ -452,13 +466,13 @@ export class PrayTimes {
       format == "24h"
         ? this.twoDigitsFormat(hours)
         : ((hours + 12 - 1) % 12) + 1;
-    return (
-      hour + ":" + this.twoDigitsFormat(minutes) + (suffix ? " " + suffix : "")
-    );
+    const formattedHour =
+      hour + ":" + this.twoDigitsFormat(minutes) + (suffix ? " " + suffix : "");
+    return formattedHour;
   }
 
   // apply offsets to the times
-  tuneTimes(times: Record<TimeName, number>) {
+  private tuneTimes(times: Record<TimeName, number>) {
     for (const i in times) {
       const time = i as TimeName;
       times[time] += (this.offset[time] ?? 0) / 60;
@@ -467,16 +481,16 @@ export class PrayTimes {
   }
 
   // compute asr time
-  asrTime(factor: number, time: number) {
-    assert(this.jDate);
-    assert(this.lat);
+  private asrTime(factor: number, time: number) {
+    assert(this.jDate !== undefined);
+    assert(this.lat !== undefined);
     const decl = this.sunPosition(this.jDate + time).declination;
     const angle = -DMath.arccot(factor + DMath.tan(Math.abs(this.lat - decl)));
     return this.sunAngleTime(angle, time);
   }
 
   // get asr shadow factor
-  asrFactor(asrParam?: string | number) {
+  private asrFactor(asrParam?: string | number) {
     if (typeof asrParam !== "string") {
       return asrParam ?? 0;
     }
@@ -486,7 +500,7 @@ export class PrayTimes {
     );
   }
 
-  dayPortion(times: Record<Exclude<TimeName, "midnight">, number>) {
+  private dayPortion(times: Record<Exclude<TimeName, "midnight">, number>) {
     for (const i in times) {
       const time = i as Exclude<TimeName, "midnight">;
       times[time] /= 24;
@@ -494,15 +508,17 @@ export class PrayTimes {
     return times;
   }
 
-  riseSetAngle() {
+  private riseSetAngle() {
     //var earthRad = 6371009; // in meters
     //var angle = DMath.arccos(earthRad/(earthRad+ elv));
-    assert(this.elv, "PrayerTimes.elv not defined");
+    assert(this.elv !== undefined, "PrayerTimes.elv not defined");
     const angle = 0.0347 * Math.sqrt(this.elv); // an approximation
     return 0.833 + angle;
   }
 
-  computePrayerTimes(times: Record<Exclude<TimeName, "midnight">, number>) {
+  private computePrayerTimes(
+    times: Record<Exclude<TimeName, "midnight">, number>
+  ) {
     times = this.dayPortion(times);
     const params = this.settings;
 
@@ -540,8 +556,8 @@ export class PrayTimes {
     const params = this.settings;
     for (const i in times) {
       const time = i as Exclude<TimeName, "midnight">;
-      assert(this.timeZone);
-      assert(this.lng);
+      assertDefined(this.timeZone);
+      assertDefined(this.lng);
       times[time] += this.timeZone - this.lng / 15;
     }
 
@@ -594,7 +610,7 @@ export class PrayTimes {
   }
 
   // adjust a time for higher latitudes
-  adjustHLTime(
+  private adjustHLTime(
     time: number,
     base: number,
     angle: number,
@@ -612,7 +628,7 @@ export class PrayTimes {
   }
 
   // the night portion used for adjusting times in higher latitudes
-  nightPortion(angle: number, night: number) {
+  private nightPortion(angle: number, night: number) {
     const method = this.settings.highLats;
     let portion = 1 / 2; // MidNight
     if (method == "AngleBased") portion = (1 / 60) * angle;
@@ -625,7 +641,7 @@ export class PrayTimes {
   }
 
   // ----- Misc Functions ----
-  eval(val?: number | string) {
+  private eval(val?: number | string) {
     if (typeof val !== "string") {
       return val ?? 0;
     }
@@ -633,12 +649,18 @@ export class PrayTimes {
   }
 
   // detect if input contains 'min'
-  isMin(arg?: string | number) {
+  private isMin(arg?: string | number) {
     return typeof arg !== "number" && (arg ?? "").indexOf("min") != -1;
   }
 
   // add a leading 0 if necessary
-  twoDigitsFormat(num: number) {
+  private twoDigitsFormat(num: number) {
     return num < 10 ? "0" + num : num;
   }
 }
+
+const prayerTimeCalculator = new PrayTimes("Egypt");
+prayerTimeCalculator.adjust({
+  timeFormat: "24h",
+});
+export default prayerTimeCalculator;
