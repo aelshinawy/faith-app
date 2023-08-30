@@ -1,18 +1,20 @@
 import React, { FC } from "react";
 import {
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
   IonContent,
   IonHeader,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import { TimeName } from "../../calculations/PrayerTimeCalculator";
+import AdhanTimeCard from "../../components/AdhanTimeCard/AdhanTimeCard";
+import { megaphone } from "ionicons/icons";
 
-const PrayerTabTemplate: FC = () => {
+interface PrayerTabTemplateProps {
+  prayerTimes?: Record<TimeName, string>;
+}
+
+const PrayerTabTemplate: FC<PrayerTabTemplateProps> = (props) => {
   return (
     <IonPage>
       <IonHeader>
@@ -21,17 +23,35 @@ const PrayerTabTemplate: FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonCard>
-          <IonCardHeader>
-            <IonCardTitle>Card Title</IonCardTitle>
-            <IonCardSubtitle>Card Subtitle</IonCardSubtitle>
-          </IonCardHeader>
-
-          <IonCardContent>
-            Here&apos;s a small text description for the card content. Nothing
-            more, nothing less.
-          </IonCardContent>
-        </IonCard>
+        <div className={"overflow-hidden"}>
+          <div className="">
+            <AdhanTimeCard
+              icon={megaphone}
+              name={"fajr"}
+              time={props.prayerTimes?.fajr}
+            />
+            <AdhanTimeCard
+              icon={megaphone}
+              name={"dhuhr"}
+              time={props.prayerTimes?.dhuhr}
+            />
+            <AdhanTimeCard
+              icon={megaphone}
+              name={"asr"}
+              time={props.prayerTimes?.asr}
+            />
+            <AdhanTimeCard
+              icon={megaphone}
+              name={"maghrib"}
+              time={props.prayerTimes?.maghrib}
+            />
+            <AdhanTimeCard
+              icon={megaphone}
+              name={"isha"}
+              time={props.prayerTimes?.isha}
+            />
+          </div>
+        </div>
       </IonContent>
     </IonPage>
   );

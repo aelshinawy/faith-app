@@ -15,6 +15,8 @@ import { ellipse, moon, square } from "ionicons/icons";
 import PrayerTab from "./pages/PrayerTab/PrayerTab";
 import Tab2 from "./pages/Tab2";
 import Tab3 from "./pages/Tab3"; /* Core CSS required for Ionic components to work properly */
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min"; /* Bootstrap imports */
 import "@ionic/react/css/core.css"; /* Basic CSS for apps built with Ionic */
 import "@ionic/react/css/normalize.css";
 import "@ionic/react/css/structure.css";

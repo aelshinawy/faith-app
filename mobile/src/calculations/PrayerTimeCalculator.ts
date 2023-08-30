@@ -1,8 +1,8 @@
 //--------------------- Copyright Block ----------------------
 /*
 
-PrayTimes.js: Prayer Times Calculator (ver 2.3)
-Copyright (C) 2007-2011 PrayTimes.org
+PrayerTimeCalculator.js: Prayer Times Calculator (ver 2.3)
+Copyright (C) 2007-2011 PrayerTimeCalculator.org
 
 Developer: Hamid Zarrabi-Zadeh
 License: GNU LGPL v3.0
@@ -11,7 +11,7 @@ TERMS OF USE:
 	Permission is granted to use this code, with or
 	without modification, in any website or application
 	provided that credit is given to the original work
-	with a link back to PrayTimes.org.
+	with a link back to PrayerTimeCalculator.org.
 
 This program is distributed in the hope that it will
 be useful, but WITHOUT ANY WARRANTY.
@@ -23,7 +23,7 @@ PLEASE DO NOT REMOVE THIS COPYRIGHT BLOCK.
 /*
  * Translated to TypeScript by: Ali Haitham Youssef Mahmoud
  * NOTE:
- *   This program is functionally identical to the PrayTimes.js
+ *   This program is functionally identical to the PrayerTimeCalculator.js
  *   program available on http://praytimes.org. It has just been
  *   implemented in TypeScript, introducing typing. */
 
@@ -55,7 +55,7 @@ http://praytimes.org/calculation
 //------------------------- Sample Usage --------------------------
 
 
-	var PT = new PrayTimes('ISNA');
+	var PT = new PrayerTimeCalculator('ISNA');
 	var times = PT.getTimes(new Date(), [43, -80], -5);
 	document.write('Sunrise = '+ times.sunrise)
 
@@ -115,7 +115,7 @@ const DMath = {
 };
 
 // -------- Constants --------
-const timeNames = {
+export const timeNames = {
   imsak: "Imsak",
   fajr: "Fajr",
   sunrise: "Sunrise",
@@ -127,7 +127,7 @@ const timeNames = {
   midnight: "Midnight",
 } as const;
 
-const methods = {
+export const methods = {
   MWL: {
     name: "Muslim World League",
     params: { fajr: 18, isha: 17 },
@@ -158,7 +158,7 @@ const methods = {
   },
 } as const;
 
-const asrJuristics = [
+export const asrJuristics = [
   "Standard", // Shafi`i, Maliki, Ja`fari, Hanbali
   "Hanafi", // Hanafi
 ] as const;
@@ -170,7 +170,7 @@ const highLatMethods = [
   "None", // No adjustment
 ] as const;
 
-const timeFormats = [
+export const timeFormats = [
   "24h", // 24-hour format
   "12h", // 12-hour format
   "12hNS", // 12-hour format with no suffix
@@ -180,14 +180,14 @@ const timeFormats = [
 const timeSuffixes = ["am", "pm"] as const;
 
 // -------- Types --------
-type TimeName = keyof typeof timeNames;
-type Method = keyof typeof methods;
+export type TimeName = keyof typeof timeNames;
+export type Method = keyof typeof methods;
 type Params = Partial<Record<TimeName, number | string>>;
 type Settings = Params & {
   highLats?: (typeof highLatMethods)[number];
   timeFormat?: (typeof timeFormats)[number];
 };
-type TimeFormat = (typeof timeFormats)[number];
+export type TimeFormat = (typeof timeFormats)[number];
 type TimeOffsets = Partial<Record<TimeName, number>>;
 type RotationDirection = "ccw" | "cw";
 
@@ -209,7 +209,7 @@ const defaultTimeFormat: TimeFormat = "24h";
 const numIterations = 1;
 const invalidTime = "-----";
 
-class PrayTimes {
+class PrayerTimeCalculator {
   private calcMethod: Method;
   private lat?: number;
   private lng?: number;
@@ -298,8 +298,6 @@ class PrayTimes {
     this.lng = coords[1];
     this.elv = coords[2] ? coords[2] : 0;
     this.timeFormat = format || this.timeFormat;
-    console.log("format is supposed to be: ", format);
-    console.log("format is set to: ", this.timeFormat);
 
     if (date instanceof Date)
       date = [date.getFullYear(), date.getMonth() + 1, date.getDate()];
@@ -308,8 +306,6 @@ class PrayTimes {
       timezone = this.getTimeZone(date);
 
     this.timeZone = timezone;
-
-    console.log("this.timezone = ", this.timeZone);
     this.jDate = this.julian(date) - this.lng / (15 * 24);
 
     return this.computeTimes();
@@ -447,7 +443,6 @@ class PrayTimes {
         times[time],
         this.timeFormat
       );
-      console.log(formattedTimes[time]);
     }
     return formattedTimes;
   }
@@ -455,7 +450,6 @@ class PrayTimes {
   // convert float time to the given format (see timeFormats)
   private getFormattedTime(time: number, format: TimeFormat) {
     if (isNaN(time)) return invalidTime;
-    console.log(`modifying format of ${time} to `, format);
     if (format == "Float") return String(time);
 
     time = DMath.fixHour(time + 0.5 / 60); // add 0.5 minutes to round
@@ -659,6 +653,6 @@ class PrayTimes {
   }
 }
 
-const prayerTimeCalculator = new PrayTimes("Egypt");
+const prayerTimeCalculator = new PrayerTimeCalculator("Egypt");
 prayerTimeCalculator.setTimeFormat("12h");
 export default prayerTimeCalculator;

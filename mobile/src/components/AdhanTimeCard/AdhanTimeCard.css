@@ -1,0 +1,7 @@
+.adhan-time-card {
+
+}
+
+.adhan-time-card .name {
+    text-transform: capitalize;
+}
