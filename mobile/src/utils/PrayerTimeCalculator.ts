@@ -64,7 +64,7 @@ http://praytimes.org/calculation
 
 //---------------------- Degree-Based Math Class -----------------------
 
-import { assert, assertDefined } from "../utils/assert";
+import { assert, assertDefined } from "./assert";
 
 const DMath = {
   dtr: function (d: number) {

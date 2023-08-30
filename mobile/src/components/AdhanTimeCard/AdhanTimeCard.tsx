@@ -7,7 +7,7 @@ import {
   IonCardTitle,
   IonIcon,
 } from "@ionic/react";
-import { TimeName } from "../../calculations/PrayerTimeCalculator";
+import { TimeName } from "../../utils/PrayerTimeCalculator";
 import "./AdhanTimeCard.css";
 
 interface AdhanTimeCardProps {

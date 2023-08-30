@@ -6,7 +6,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { TimeName } from "../../calculations/PrayerTimeCalculator";
+import { TimeName } from "../../utils/PrayerTimeCalculator";
 import AdhanTimeCard from "../../components/AdhanTimeCard/AdhanTimeCard";
 import { megaphone } from "ionicons/icons";
 
