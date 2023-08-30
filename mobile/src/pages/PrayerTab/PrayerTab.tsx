@@ -29,10 +29,12 @@ const PrayerTab: React.FC = () => {
 
   useEffect(() => {
     geolocation.checkPermissions().then((status) => {
-      if (status.coarseLocation === "granted") {
+      if (status.coarseLocation !== "granted") {
         geolocation.requestPermissions().then((status) => {
           updatePrayerTimes(status.coarseLocation);
         });
+      } else {
+        updatePrayerTimes(status.coarseLocation);
       }
     });
   }, []);
