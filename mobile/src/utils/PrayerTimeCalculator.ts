@@ -41,7 +41,7 @@ http://praytimes.org/calculation
 //------------------------ User Interface -------------------------
 
 
-	getTimes (date, coordinates [, timeZone [, timeFormat]]])
+	getTimes (date, coordinates [, timeZone,  dst [, timeFormat]]])
 
 	setMethod (method)       // set calculation method
 	adjust (parameters)      // adjust calculation parameters
@@ -292,6 +292,7 @@ class PrayerTimeCalculator {
     date: Date | number[],
     coords: number[],
     timezone?: number | "auto",
+    dst?: number | "auto",
     format?: TimeFormat
   ) {
     this.lat = coords[0];
@@ -305,7 +306,11 @@ class PrayerTimeCalculator {
     if (timezone === undefined || timezone == "auto")
       timezone = this.getTimeZone(date);
 
-    this.timeZone = timezone;
+    if (dst === undefined || dst === "auto") dst = this.getDst(date);
+
+    this.timeZone = timezone + (dst !== 0 ? 1 : 0);
+
+    console.log("timezone: ", this.timeZone);
     this.jDate = this.julian(date) - this.lng / (15 * 24);
 
     return this.computeTimes();
@@ -326,6 +331,11 @@ class PrayerTimeCalculator {
     const GMTDiff = timeString.split(" ")[1];
     const hoursDiff = Number.parseInt(GMTDiff.slice(3, GMTDiff.length)) / 100;
     return hoursDiff;
+  }
+
+  // Get Daylight Saving Time
+  private getDst(date: Array<number>) {
+    return +(this.gmtOffset(date) !== this.getTimeZone(date));
   }
 
   // ---- Calculation Functions ----
