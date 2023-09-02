@@ -22,8 +22,8 @@ interface IpStackData {
 }
 
 export interface LocationData {
-  country_code: string;
-  country_name: string;
+  country_code?: string;
+  country_name?: string;
   coords: [number, number];
 }
 

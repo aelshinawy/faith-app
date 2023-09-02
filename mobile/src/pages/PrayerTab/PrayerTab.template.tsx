@@ -29,26 +29,31 @@ const PrayerTabTemplate: FC<PrayerTabTemplateProps> = (props) => {
               icon={megaphone}
               name={"fajr"}
               time={props.prayerTimes?.fajr}
+              endTime={props.prayerTimes?.dhuhr}
             />
             <AdhanTimeCard
               icon={megaphone}
               name={"dhuhr"}
               time={props.prayerTimes?.dhuhr}
+              endTime={props.prayerTimes?.asr}
             />
             <AdhanTimeCard
               icon={megaphone}
               name={"asr"}
               time={props.prayerTimes?.asr}
+              endTime={props.prayerTimes?.maghrib}
             />
             <AdhanTimeCard
               icon={megaphone}
               name={"maghrib"}
               time={props.prayerTimes?.maghrib}
+              endTime={props.prayerTimes?.isha}
             />
             <AdhanTimeCard
               icon={megaphone}
               name={"isha"}
               time={props.prayerTimes?.isha}
+              endTime={props.prayerTimes?.midnight}
             />
           </div>
         </div>

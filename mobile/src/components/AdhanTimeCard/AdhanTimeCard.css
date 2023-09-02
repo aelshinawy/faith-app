@@ -1,7 +1,20 @@
-.adhan-time-card {
-
+.adhan-time-card-container .name {
+    text-transform: capitalize;
 }
 
-.adhan-time-card .name {
-    text-transform: capitalize;
+.adhan-time-card.past {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.adhan-time-card.current, .adhan-time-card.current ion-card-subtitle {
+    background-color: #ccc;
+    color: black;
+}
+
+.adhan-time-card ion-card-title {
+}
+
+.adhan-time-card.current ion-card-title {
+    color: #191919;
 }
