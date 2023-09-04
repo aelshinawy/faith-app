@@ -1,9 +1,36 @@
-import { assert } from "./assert";
+import {assert} from "./assert";
 
-export const formattedTimeToDate = (formattedTime: string) => {
+// ----- UNIT CONVERSIONS -----
+export const minsToMs = (n: number) => {
+  return n * 60000;
+};
+
+export const daysToMs = (n: number) => {
+  return n * 86400000;
+};
+
+// ----- OTHER UTILS -----
+export const nextDay = (date: Date = new Date()) => {
+  return new Date(date.valueOf() + daysToMs(1));
+};
+
+export const prevDay = (date: Date = new Date()) => {
+  return new Date(date.valueOf() - daysToMs(1));
+};
+
+export const formattedTimeToDate = (
+  formattedTime: string,
+  day?: Date | [number, number, number]
+) => {
   const suffix = formattedTime.slice(-2);
   if (suffix === "pm" || suffix === "am") {
     formattedTime = formattedTime.trim().slice(0, -2);
+  }
+
+  if (day === undefined) {
+    day = new Date();
+  } else if (day instanceof Array) {
+    day = new Date(...day);
   }
 
   const date = new Date();

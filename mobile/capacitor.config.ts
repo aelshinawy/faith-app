@@ -1,12 +1,18 @@
-import { CapacitorConfig } from '@capacitor/cli';
+import { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'mobile',
-  webDir: 'build',
+  appId: "io.ionic.starter",
+  appName: "mobile",
+  webDir: "build",
   server: {
-    androidScheme: 'https'
-  }
+    androidScheme: "https",
+  },
+  plugins: {
+    LocalNotifications: {
+      smallIcon: "prayermat",
+      iconColor: "#fff",
+    },
+  },
 };
 
 export default config;

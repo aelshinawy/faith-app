@@ -5,14 +5,12 @@
 .adhan-time-card.past {
     background-color: transparent;
     box-shadow: none;
+    filter: brightness(0.5);
 }
 
 .adhan-time-card.current, .adhan-time-card.current ion-card-subtitle {
     background-color: #ccc;
     color: black;
-}
-
-.adhan-time-card ion-card-title {
 }
 
 .adhan-time-card.current ion-card-title {

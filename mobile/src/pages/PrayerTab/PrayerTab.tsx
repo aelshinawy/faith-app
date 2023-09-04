@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import "./PrayerTab.css";
 import PrayerTabTemplate from "./PrayerTab.template";
 import {
@@ -10,30 +10,64 @@ import prayerTimeCalculator, {
   TimeName,
 } from "../../utils/PrayerTimeCalculator";
 import { assertDefined } from "../../utils/assert";
+import { nextDay, prevDay } from "../../utils/time";
+
+type Increment = { type: "increment" };
+type Decrement = { type: "decrement" };
+
+function currentDateReducer(currentDate: Date, action: Increment | Decrement) {
+  switch (action.type) {
+    case "increment":
+      return nextDay(currentDate);
+    case "decrement":
+      return prevDay(currentDate);
+  }
+}
 
 const PrayerTab: React.FC = () => {
   const {
     data: locationData,
-    isFetching,
-    isSuccess,
+    isFetching: isFetchingLocationData,
+    isSuccess: isSuccessLocationData,
   } = useQuery(
     "location",
     async () => await getGeolocation(await getGeolocationAvailability())
   );
 
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, dateDispatch] = useReducer(
+    currentDateReducer,
+    new Date()
+  );
   const [prayerTimes, setPrayerTimes] = useState<Record<TimeName, string>>();
 
+  const onNextDay = () => {
+    dateDispatch({
+      type: "increment",
+    });
+  };
+
+  const onPrevDay = () => {
+    dateDispatch({
+      type: "decrement",
+    });
+  };
+
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccessLocationData) {
       assertDefined(locationData);
       setPrayerTimes(
         prayerTimeCalculator.getTimes(currentDate, locationData?.coords)
       );
     }
-  }, [isFetching]);
+  }, [isFetchingLocationData]);
 
-  return <PrayerTabTemplate prayerTimes={prayerTimes} />;
+  return (
+    <PrayerTabTemplate
+      onNextDay={onNextDay}
+      onPrevDay={onPrevDay}
+      prayerTimes={prayerTimes}
+    />
+  );
 };
 
 export default PrayerTab;
