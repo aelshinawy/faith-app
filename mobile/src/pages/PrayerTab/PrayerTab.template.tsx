@@ -1,11 +1,5 @@
 import React, { FC } from "react";
-import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
+import { IonContent, IonPage } from "@ionic/react";
 import { TimeName } from "../../utils/PrayerTimeCalculator";
 import AdhanTimeCard from "../../components/AdhanTimeCard/AdhanTimeCard";
 
@@ -18,11 +12,11 @@ interface PrayerTabTemplateProps {
 const PrayerTabTemplate: FC<PrayerTabTemplateProps> = (props) => {
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Prayer</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+      {/*<IonHeader>*/}
+      {/*  <IonToolbar>*/}
+      {/*    <IonTitle>Prayer</IonTitle>*/}
+      {/*  </IonToolbar>*/}
+      {/*</IonHeader>*/}
       <IonContent fullscreen>
         <div className={"overflow-hidden"}>
           <div className="">

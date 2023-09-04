@@ -80,8 +80,11 @@ export const getGeolocation = async (
 
   let coords: Position["coords"];
 
+  console.log("access is currently: ", access);
+
   switch (access) {
     case undefined:
+    case "unavailable":
     case "denied":
     case "prompt":
     case "prompt-with-rationale":
