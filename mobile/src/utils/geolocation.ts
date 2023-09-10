@@ -64,12 +64,13 @@ export const getGeolocation = async (
         data: {
           country_code: cachedData.country_code,
           country_name: cachedData.country_name,
-          latitude: cachedData.latitude,
-          longitude: cachedData.longitude,
+          latitude: cachedData.coords[0],
+          longitude: cachedData.coords[1],
         },
       } as AxiosResponse<IpStackData>;
     });
 
+  console.log(ipstackLocation);
   const locationData: LocationData = {
     country_code: ipstackLocation.country_code,
     country_name: ipstackLocation.country_name,
