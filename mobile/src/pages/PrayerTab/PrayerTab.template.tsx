@@ -2,6 +2,10 @@ import React, { FC } from "react";
 import { IonContent, IonPage } from "@ionic/react";
 import { TimeName } from "../../utils/PrayerTimeCalculator";
 import AdhanTimeCard from "../../components/AdhanTimeCard/AdhanTimeCard";
+import { useAtom } from "jotai/react";
+import currentDateTimeAtom from "../../atoms/currentDateTime";
+import { hrMinFormat } from "../../utils/time";
+import { timeFormatAtom } from "../../atoms/userOptions";
 
 interface PrayerTabTemplateProps {
   prayerTimes?: Record<TimeName, string>;
@@ -10,16 +14,19 @@ interface PrayerTabTemplateProps {
 }
 
 const PrayerTabTemplate: FC<PrayerTabTemplateProps> = (props) => {
+  const [dateTime] = useAtom(currentDateTimeAtom);
+  const [timeFormat] = useAtom(timeFormatAtom);
+
   return (
     <IonPage>
-      {/*<IonHeader>*/}
-      {/*  <IonToolbar>*/}
-      {/*    <IonTitle>Prayer</IonTitle>*/}
-      {/*  </IonToolbar>*/}
-      {/*</IonHeader>*/}
       <IonContent fullscreen>
+        <div className="header">
+          <h1 className={"ms-3 display-3"}>
+            {hrMinFormat(dateTime, timeFormat)}
+          </h1>
+        </div>
         <div className={"overflow-hidden"}>
-          <div className="">
+          <div>
             <AdhanTimeCard
               name={"fajr"}
               time={props.prayerTimes?.fajr}

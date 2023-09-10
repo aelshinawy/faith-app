@@ -11,6 +11,8 @@ import prayerTimeCalculator, {
 } from "../../utils/PrayerTimeCalculator";
 import { assertDefined } from "../../utils/assert";
 import { nextDay, prevDay } from "../../utils/time";
+import { useAtom } from "jotai/react";
+import { timeFormatAtom } from "../../atoms/userOptions";
 
 type Increment = { type: "increment" };
 type Decrement = { type: "decrement" };
@@ -34,6 +36,8 @@ const PrayerTab: React.FC = () => {
     async () => await getGeolocation(await getGeolocationAvailability())
   );
 
+  const [timeFormat] = useAtom(timeFormatAtom);
+
   const [currentDate, dateDispatch] = useReducer(
     currentDateReducer,
     new Date()
@@ -56,7 +60,13 @@ const PrayerTab: React.FC = () => {
     if (isSuccessLocationData) {
       assertDefined(locationData);
       setPrayerTimes(
-        prayerTimeCalculator.getTimes(currentDate, locationData?.coords)
+        prayerTimeCalculator.getTimes(
+          currentDate,
+          locationData?.coords,
+          "auto",
+          "auto",
+          timeFormat
+        )
       );
     }
   }, [isFetchingLocationData]);

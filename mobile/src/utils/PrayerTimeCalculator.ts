@@ -177,7 +177,8 @@ export const timeFormats = [
   "Float", // floating point number
 ] as const;
 
-const timeSuffixes = ["am", "pm"] as const;
+export const timeSuffixes = ["am", "pm"] as const;
+export type TimeSuffix = (typeof timeSuffixes)[number];
 
 // -------- Types --------
 export type TimeName = keyof typeof timeNames;

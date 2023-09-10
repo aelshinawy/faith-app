@@ -1,4 +1,5 @@
 import {assert} from "./assert";
+import {TimeFormat, TimeSuffix, timeSuffixes} from "./PrayerTimeCalculator"; // ----- UNIT CONVERSIONS -----
 
 // ----- UNIT CONVERSIONS -----
 export const minsToMs = (n: number) => {
@@ -9,15 +10,20 @@ export const daysToMs = (n: number) => {
   return n * 86400000;
 };
 
-// ----- OTHER UTILS -----
-export const nextDay = (date: Date = new Date()) => {
-  return new Date(date.valueOf() + daysToMs(1));
+// ----- PERFECT UNITS -----
+export const toPerfectMin = (date?: Date) => {
+  if (date === undefined) date = new Date();
+  date.setHours(date.getHours(), date.getMinutes(), 0, 0);
+  return date;
 };
 
-export const prevDay = (date: Date = new Date()) => {
-  return new Date(date.valueOf() - daysToMs(1));
+export const nextPerfectMin = (date?: Date) => {
+  if (date === undefined) date = new Date();
+  date.setHours(date.getHours(), date.getMinutes() + 1, 0, 0);
+  return date;
 };
 
+// ----- FORMAT UTILS -----
 export const formattedTimeToDate = (
   formattedTime: string,
   day?: Date | [number, number, number]
@@ -37,9 +43,12 @@ export const formattedTimeToDate = (
   const time = formattedTime?.split(":").map((val) => {
     return parseInt(val);
   }) as [number, number];
-  console.log("we got time:", time);
 
-  time[0] = time[0] % 12;
+  console.log("unformatted time is:", time);
+
+  time[0] = timeSuffixes.includes(suffix as TimeSuffix)
+    ? time[0] % 12
+    : time[0];
   if (time[0] === 0 && suffix === "am") {
     time[0] = 24;
   }
@@ -48,6 +57,58 @@ export const formattedTimeToDate = (
     date.setHours(...time, 0, 0);
   }
   return date;
+};
+
+export const twoDigitNum = (n: number) => {
+  if (n < 10) return `0${n}`;
+  return n;
+};
+
+export const getDefaultFormat = (): TimeFormat => {
+  const suffix = new Date().toLocaleTimeString().slice(-2);
+
+  if (suffix === "am" || suffix === "pm") {
+    return "12h";
+  }
+
+  return "24h";
+};
+
+export const hrMinFormat = (date: Date, format?: TimeFormat) => {
+  if (format === undefined) {
+    format = getDefaultFormat();
+  }
+
+  let suffix: string;
+
+  switch (format) {
+    case "12h":
+      suffix = date.getHours() < 12 ? "am" : "pm";
+      return `${twoDigitNum(date.getHours() % 12)}:${twoDigitNum(
+        date.getMinutes()
+      )} ${suffix}`;
+    case "12hNS":
+      return `${twoDigitNum(date.getHours() % 12)}:${twoDigitNum(
+        date.getMinutes()
+      )}`;
+    case "24h":
+      return `${twoDigitNum(date.getHours())}:${twoDigitNum(
+        date.getMinutes()
+      )}`;
+    case "Float":
+      return `${date.getHours() + date.getMinutes() / 60}`;
+    default:
+      throw "lolololol, everything broke. idiot";
+  }
+};
+
+// ----- OTHER UTILS -----
+export const nextDay = (date: Date = new Date()) => {
+  return new Date(date.valueOf() + daysToMs(1));
+};
+
+export const prevDay = (date: Date = new Date()) => {
+  return new Date(date.valueOf() - daysToMs(1));
 };
 
 export const todayAtTime = (time: [number, number]) => {

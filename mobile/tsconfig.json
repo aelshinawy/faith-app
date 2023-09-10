@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
     "target": "esNext",
     "lib": [
       "dom",
@@ -25,6 +26,6 @@
     ]
   },
   "include": [
-    "src"
+    "src/**/*"
   ]
 }

@@ -8,6 +8,8 @@ import {
 import { TimeName } from "../../utils/PrayerTimeCalculator";
 import "./AdhanTimeCard.css";
 import { compareDateToRange, formattedTimeToDate } from "../../utils/time";
+import { useAtom } from "jotai/react";
+import currentDateTime from "../../atoms/currentDateTime";
 
 interface AdhanTimeCardProps {
   name: TimeName;
@@ -16,35 +18,33 @@ interface AdhanTimeCardProps {
 }
 
 const AdhanTimeCard: FC<AdhanTimeCardProps> = (props) => {
-  const status = useMemo(() => {
-    console.log(`%c${props.name}`, "font-size: 20pt;");
+  const [dateTime] = useAtom(currentDateTime);
 
-    if (!props.time || !props.endTime) return "na";
+  const status = useMemo(() => {
+    if (!props.time || !props.endTime) return "n/a";
     const range = [
       formattedTimeToDate(props.time),
       formattedTimeToDate(props.endTime),
     ] as [Date, Date];
-    switch (compareDateToRange(new Date(), range)) {
+    switch (compareDateToRange(dateTime, range)) {
       case -1:
         return "upcoming";
       case 0:
         return "current";
       case 1:
         return "past";
-      default:
-        throw "weeee waaa weee waaa weee waa";
     }
-  }, [props.time, props.endTime]);
+  }, [dateTime, props.time, props.endTime]);
 
   return (
     <div className="adhan-time-card-container text-center">
       <IonCard
         className={
           "adhan-time-card d-flex justify-content-between" +
-          ` text-capitalize align-items-center p-3 ${status}`
+          `  align-items-center p-3 ${status}`
         }
       >
-        <IonCardHeader className={"d-flex flex-row gap-1 p-0"}>
+        <IonCardHeader className={"d-flex text-capitalize flex-row gap-1 p-0"}>
           <IonCardTitle>{props.name}</IonCardTitle>
         </IonCardHeader>
 

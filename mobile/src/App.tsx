@@ -1,19 +1,5 @@
-import React from "react";
-import { Redirect, Route } from "react-router-dom";
-import {
-  IonApp,
-  IonIcon,
-  IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
-  setupIonicReact,
-} from "@ionic/react";
-import { IonReactRouter } from "@ionic/react-router";
-import { book, settings } from "ionicons/icons";
-import PrayerTab from "./pages/PrayerTab/PrayerTab";
-import Tab2 from "./pages/Tab2";
-import SettingsTab from "./pages/SettingsTab/SettingsTab"; /* Core CSS required for Ionic components to work properly */
+import React, { useEffect, useRef } from "react";
+import { setupIonicReact } from "@ionic/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min"; /* Bootstrap imports */
 import "@ionic/react/css/core.css"; /* Basic CSS for apps built with Ionic */
@@ -27,42 +13,29 @@ import "@ionic/react/css/text-transformation.css";
 import "@ionic/react/css/flex-utils.css";
 import "@ionic/react/css/display.css"; /* Theme variables */
 import "./theme/variables.css";
-import prayerMat from "./assets/icons/prayermat.svg";
+import AppTemplate from "./App.template";
+import { useAtom } from "jotai/react";
+import { updateDateTimeAtom } from "./atoms/currentDateTime";
+import { minsToMs, nextPerfectMin } from "./utils/time";
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route exact path="/prayer">
-            <PrayerTab />
-          </Route>
-          <Route exact path="/tab2">
-            <Tab2 />
-          </Route>
-          <Route path="/tab3">
-            <SettingsTab />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/prayer" />
-          </Route>
-        </IonRouterOutlet>
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="prayer-tab" href="/prayer">
-            <IonIcon aria-hidden="true" src={prayerMat} />
-          </IonTabButton>
-          <IonTabButton tab="tab2" href="/tab2">
-            <IonIcon aria-hidden="true" icon={book} />
-          </IonTabButton>
-          <IonTabButton tab="tab3" href="/tab3">
-            <IonIcon aria-hidden="true" icon={settings} />
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  const [, updateDateTime] = useAtom(updateDateTimeAtom);
+  const timeout = useRef<NodeJS.Timeout>();
+
+  useEffect(() => {
+    if (timeout.current === undefined) {
+      const timeTillNextMin = nextPerfectMin().valueOf() - new Date().valueOf();
+      console.log(`setting timeout for ${timeTillNextMin}ms`);
+      timeout.current = setTimeout(() => {
+        setInterval(updateDateTime, minsToMs(1));
+        updateDateTime();
+      }, timeTillNextMin);
+    }
+  }, []);
+
+  return <AppTemplate />;
+};
 
 export default App;
