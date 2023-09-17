@@ -31,11 +31,12 @@ export const getGeolocationAvailability = async () => {
   const geolocationAccess: "unavailable" | PermissionState = await geolocation
     .checkPermissions()
     .then(async (status) => {
+      console.log("CURRENT STATUS: ", status);
       if (status.coarseLocation !== "granted") {
+        console.log("ACCESS TO LOCATION HAS NOT BE GRANTED");
         const newStatus = await geolocation.requestPermissions().catch(() => {
-          return { coarseLocation: "unavailable" } as {
-            coarseLocation: typeof geolocationAccess;
-          };
+          console.log("requestPermissions did not work");
+          return status;
         });
         return newStatus.coarseLocation;
       } else {
@@ -44,6 +45,7 @@ export const getGeolocationAvailability = async () => {
     })
     .catch((err) => {
       console.error(err);
+      console.log("THERE WAS AN ERROR WITH OBTAINING ACCESS");
       return "unavailable";
     });
 
@@ -87,13 +89,14 @@ export const getGeolocation = async (
     case undefined:
     case "unavailable":
     case "denied":
-    case "prompt":
     case "prompt-with-rationale":
       //TODO: figure out what "prompt" and "prompt-with-rationale"
+      console.log("location services not available");
       appDB.set("geolocation", locationData).then((val) => {
         console.log("location has been set to", locationData);
       });
       return locationData;
+    case "prompt":
     case "granted":
       coords = await geolocation.getCurrentPosition().then((pos) => pos.coords);
       locationData.coords = [coords.latitude, coords.longitude];

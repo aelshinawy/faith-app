@@ -15,7 +15,7 @@ import "@ionic/react/css/display.css"; /* Theme variables */
 import "./theme/variables.css";
 import AppTemplate from "./App.template";
 import { useAtom } from "jotai/react";
-import { updateDateTimeAtom } from "./atoms/currentDateTime";
+import { updateDateTimeAtom } from "./atoms/time";
 import { minsToMs, nextPerfectMin } from "./utils/time";
 
 setupIonicReact();
@@ -33,6 +33,9 @@ const App: React.FC = () => {
         updateDateTime();
       }, timeTillNextMin);
     }
+    window.onfocus = (e) => {
+      updateDateTime();
+    };
   }, []);
 
   return <AppTemplate />;

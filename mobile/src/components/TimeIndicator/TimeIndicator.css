@@ -1,0 +1,15 @@
+.hr {
+    height: 1px;
+    background-color: #777;
+    flex-grow: 1;
+    margin: 0;
+}
+
+.time-start {
+    font-size: 14px;
+    color: #949494;
+}
+
+.time-indicator.past {
+    filter: brightness(0.5);
+}

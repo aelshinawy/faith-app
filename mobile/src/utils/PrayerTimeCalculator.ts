@@ -3,7 +3,6 @@
 
 PrayerTimeCalculator.js: Prayer Times Calculator (ver 2.3)
 Copyright (C) 2007-2011 PrayerTimeCalculator.org
-
 Developer: Hamid Zarrabi-Zadeh
 License: GNU LGPL v3.0
 
@@ -39,7 +38,6 @@ http://praytimes.org/calculation
 
 
 //------------------------ User Interface -------------------------
-
 
 	getTimes (date, coordinates [, timeZone,  dst [, timeFormat]]])
 
@@ -126,6 +124,28 @@ export const timeNames = {
   isha: "Isha",
   midnight: "Midnight",
 } as const;
+export const nextTime: Omit<Record<TimeName, TimeName>, "sunset"> = {
+  imsak: "fajr",
+  fajr: "sunrise",
+  sunrise: "dhuhr",
+  dhuhr: "asr",
+  asr: "sunset",
+  maghrib: "isha",
+  isha: "midnight",
+  midnight: "fajr",
+};
+export const prevTime: Omit<Record<TimeName, TimeName>, "sunset"> = {
+  imsak: "midnight",
+  fajr: "imsak",
+  sunrise: "fajr",
+  dhuhr: "sunrise",
+  asr: "dhuhr",
+  maghrib: "asr",
+  isha: "maghrib",
+  midnight: "isha",
+};
+
+export const orderedTimeNames = Object.keys(timeNames);
 
 export const methods = {
   MWL: {

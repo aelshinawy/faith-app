@@ -44,7 +44,7 @@ export const formattedTimeToDate = (
     return parseInt(val);
   }) as [number, number];
 
-  console.log("unformatted time is:", time);
+  // console.log("unformatted time is:", time);
 
   time[0] = timeSuffixes.includes(suffix as TimeSuffix)
     ? time[0] % 12
@@ -117,20 +117,19 @@ export const todayAtTime = (time: [number, number]) => {
   return now;
 };
 
-/**
- * @returns {-1 | 0 | 1},  -1 if date is before range, 0 if date is in range,
- * 1 if
- * date is after range
- */
-export const compareDateToRange = (
-  date: Date,
-  range: [Date, Date]
-): -1 | 0 | 1 => {
+export const compareDateToRange = (date: Date, range: [Date, Date]) => {
   assert(
     range[0].getTime() < range[1].getTime(),
     `${range[0].toString()} is not an earlier date than ${range[1].toString()}`
   );
-  if (date.getTime() < range[0].getTime()) return -1;
-  if (date.getTime() >= range[1].getTime()) return 1;
-  return 0;
+  if (date.getTime() < range[0].getTime()) return "past";
+  if (date.getTime() >= range[1].getTime()) return "upcoming";
+  return "current";
+};
+
+export const timeRemaining = (date1: Date, date2: Date) => {
+  const diff = date2.getTime() - date1.getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const mins = Math.round(diff / (1000 * 60)) % 60;
+  return `${hours} hrs ${mins} mins remaining`;
 };
