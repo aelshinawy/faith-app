@@ -1,10 +1,7 @@
 import React, { useEffect, useMemo, useReducer } from "react";
 import "./PrayerTab.css";
 import PrayerTabTemplate from "./PrayerTab.template";
-import {
-  getGeolocation,
-  getGeolocationAvailability,
-} from "../../utils/geolocation";
+
 import { useQuery } from "react-query";
 import prayerTimeCalculator, {
   orderedTimeNames,
@@ -15,6 +12,12 @@ import { formattedTimeToDate, nextDay, prevDay } from "../../utils/time";
 import { useAtom } from "jotai/react";
 import { timeFormatAtom } from "../../atoms/userOptions";
 import { currentTimeNameAtom, prayerTimesAtom } from "../../atoms/time";
+import {
+  getGeolocation_cache,
+  getGeolocation_gps,
+  getGeolocation_ip,
+  LocationData,
+} from "../../utils/geolocation";
 
 type Increment = { type: "increment" };
 type Decrement = { type: "decrement" };
@@ -53,6 +56,7 @@ function getTimeStatus(
       res[timeName] = "upcoming";
     }
   });
+
   return res;
 }
 
@@ -66,14 +70,26 @@ function currentDateReducer(currentDate: Date, action: Increment | Decrement) {
 }
 
 const PrayerTab: React.FC = () => {
-  const {
-    data: locationData,
-    isFetching: isFetchingLocationData,
-    isSuccess: isSuccessLocationData,
-  } = useQuery(
-    "location",
-    async () => await getGeolocation(await getGeolocationAvailability())
+  const locationQuery_cache = useQuery("location_cache", getGeolocation_cache);
+  const locationQuery_gps = useQuery("location_gps", getGeolocation_gps);
+  const locationData: LocationData = locationQuery_cache.isSuccess
+    ? locationQuery_cache.data ?? {}
+    : {};
+  if (locationQuery_gps.isSuccess) {
+    assertDefined(locationQuery_gps.data.coords);
+    locationData.coords = locationQuery_gps.data.coords;
+  }
+  // const countryMissing = locationData.country_code === undefined,
+  //   coordsMissing = locationData.coords === undefined;
+  const locationQuery_ip = useQuery("location_ip", async () =>
+    getGeolocation_ip()
   );
+  // if(countryMissing){
+  //   locationData.country_code = locationQuery_ip.data.country_code
+  // }
+  // if(coordsMissing){
+  //
+  // }
 
   const [, setCurrentTime] = useAtom(currentTimeNameAtom);
   const [timeFormat] = useAtom(timeFormatAtom);
@@ -99,22 +115,18 @@ const PrayerTab: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isSuccessLocationData) {
+    if (locationData.coords) {
       assertDefined(locationData);
       const times = prayerTimeCalculator.getTimes(
         currentDate,
-        locationData?.coords,
+        locationData.coords,
         "auto",
         "auto",
         timeFormat
       );
-      console.log(
-        `%cmaghrib: ${times.maghrib}, sunset: ${times.sunset}`,
-        "color: yellow;"
-      );
       setPrayerTimes(times);
     }
-  }, [isFetchingLocationData]);
+  }, [locationData.coords]);
 
   return (
     <PrayerTabTemplate

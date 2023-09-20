@@ -1,111 +1,26 @@
-import { Geolocation as geolocation, Position } from "@capacitor/geolocation";
-import { PermissionState } from "@capacitor/core";
-import axios, { AxiosResponse } from "axios";
+import { Geolocation as geolocation } from "@capacitor/geolocation";
 import appDB from "./appDB";
-
-const ipStackAccessKey = "e44d3e828aa2f71545b75de478a3a09d";
-
-interface IpStackData {
-  city?: string;
-  continent_code?: string;
-  continent_name?: string;
-  country_code: string;
-  country_name: string;
-  ip?: string;
-  latitude: number;
-  longitude: number;
-  location: any;
-  region_code?: string;
-  region_name?: string;
-  type?: "ipv4" | "ipv6";
-  zip?: null | string | number;
-}
 
 export interface LocationData {
   country_code?: string;
   country_name?: string;
-  coords: [number, number];
+  coords?: [number, number];
 }
 
-export const getGeolocationAvailability = async () => {
-  const geolocationAccess: "unavailable" | PermissionState = await geolocation
-    .checkPermissions()
-    .then(async (status) => {
-      console.log("CURRENT STATUS: ", status);
-      if (status.coarseLocation !== "granted") {
-        console.log("ACCESS TO LOCATION HAS NOT BE GRANTED");
-        const newStatus = await geolocation.requestPermissions().catch(() => {
-          console.log("requestPermissions did not work");
-          return status;
-        });
-        return newStatus.coarseLocation;
-      } else {
-        return status.coarseLocation;
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      console.log("THERE WAS AN ERROR WITH OBTAINING ACCESS");
-      return "unavailable";
-    });
-
-  return geolocationAccess;
+export const getGeolocation_cache = async () => {
+  return await appDB.get("geolocation").then((val: unknown) => {
+    return val as LocationData;
+  });
 };
 
-export const getGeolocation = async (
-  access?: "unavailable" | PermissionState
-) => {
-  const { data: ipstackLocation }: AxiosResponse<IpStackData> = await axios
-    .get(`http://api.ipstack.com/check?access_key=${ipStackAccessKey}`)
-    .catch(async () => {
-      appDB.get("geolocation").then((val) => {
-        console.log("couldn't get location using ip, relying on storage", val);
-      });
-      const cachedData = (await appDB.get("geolocation")) ?? {};
-      return {
-        data: {
-          country_code: cachedData.country_code,
-          country_name: cachedData.country_name,
-          latitude: cachedData.coords[0],
-          longitude: cachedData.coords[1],
-        },
-      } as AxiosResponse<IpStackData>;
-    });
+export const getGeolocation_gps = async () => {
+  return await geolocation.getCurrentPosition().then(
+    (pos): LocationData => ({
+      coords: [pos.coords.latitude, pos.coords.longitude],
+    })
+  );
+};
 
-  console.log(ipstackLocation);
-  const locationData: LocationData = {
-    country_code: ipstackLocation.country_code,
-    country_name: ipstackLocation.country_name,
-    coords: [ipstackLocation.latitude, ipstackLocation.latitude],
-  };
-
-  console.log("current location data: ");
-
-  let coords: Position["coords"];
-
-  console.log("access is currently: ", access);
-
-  switch (access) {
-    case undefined:
-    case "unavailable":
-    case "denied":
-    case "prompt-with-rationale":
-      //TODO: figure out what "prompt" and "prompt-with-rationale"
-      console.log("location services not available");
-      appDB.set("geolocation", locationData).then((val) => {
-        console.log("location has been set to", locationData);
-      });
-      return locationData;
-    case "prompt":
-    case "granted":
-      coords = await geolocation.getCurrentPosition().then((pos) => pos.coords);
-      locationData.coords = [coords.latitude, coords.longitude];
-
-      appDB.set("geolocation", locationData).then((val) => {
-        console.log("location has been set to", locationData);
-      });
-      return locationData;
-    default:
-      throw "yikes, how'd that happen?";
-  }
+export const getGeolocation_ip = async (abort?: boolean) => {
+  throw "getGeolocation_ip not implemented";
 };
